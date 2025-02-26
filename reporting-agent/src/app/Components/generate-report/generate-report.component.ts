@@ -23,12 +23,14 @@ interface AvailableEntity {
 export class GenerateReportComponent {
   reportForm: FormGroup;
 
-  availableRelatedEntities: AvailableEntity[] = [
-    {id: '0', value: 'bills'},
-    {id: '1', value: 'accounts'}
+  availableEntities: AvailableEntity[] = [
+    {id: 'Bill', value: 'bils'},
   ];
 
-  selectedEntities: Record<string, string> = {'':''};
+  availableRelatedEntities: AvailableEntity[] = [
+    {id: 'Account', value: 'accounts'},
+    {id: 'Customer', value: 'customers'},
+  ];
 
   constructor(private fb: FormBuilder) {
     this.reportForm = this.fb.group({
@@ -51,10 +53,14 @@ export class GenerateReportComponent {
     this.reportForm.get('relatedEntityAndFields')?.setValue(updatedEntities);
   }
 
-  onEntityChange(event: MatSelectChange, key: string) {
+  onRelatedEntityChange(event: MatSelectChange, key: string) {
     const value = event.value ?? '';
-    this.selectedEntities[key] = value;
     this.updateKey(key, value);
+  }
+
+  onEntityChange(event: MatSelectChange) {
+    const value = event.value ?? '';
+    this.reportForm.get('mainEntity')?.setValue(value);
   }
   
   onValueInput(event: Event, key: string) {
