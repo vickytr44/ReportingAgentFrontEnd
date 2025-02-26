@@ -1,0 +1,67 @@
+.label-spacing {
+    margin: 8px 0;
+    font-weight: 500;
+    color: #4b5563;
+  }
+
+  .heading-style {
+    font-size: 1.25rem; /* Equivalent to text-xl */
+    font-weight: 600;   /* Equivalent to font-semibold */
+    margin-bottom: 1rem; /* Equivalent to mb-4 */
+  }
+
+  .card-style {
+    border: 1px solid #d1d5db; /* Light gray border */
+    border-radius: 8px; /* Slightly rounded corners */
+    // padding: 1.5rem; /* Equivalent to p-6 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Soft shadow */
+    background-color: white; /* Ensure a clean white background */
+  }
+
+  .input-style > * + * {
+    margin-top: 0.75rem; /* Equivalent to space-y-3 (3 * 0.25rem = 0.75rem) */
+  }
+  
+  .center-container {
+    display: flex; /* Equivalent to flex */
+    justify-content: center; /* Equivalent to justify-center */
+    align-items: center; /* Equivalent to items-center */
+    min-height: 100vh; /* Equivalent to min-h-screen */
+    background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+  }
+  
+  .custom-button {
+    width: 100%;           /* Full width */
+    padding: 0.75rem 1rem; /* Comfortable padding */
+    font-size: 1rem;       /* Readable text size */
+    font-weight: 600;      /* Semi-bold text */
+    color: white;          /* White text */
+    background-color: #3f51b5; /* Material primary color */
+    border: none;          /* Remove border */
+    border-radius: 6px;    /* Slightly rounded corners */
+    cursor: pointer;       /* Pointer on hover */
+    transition: background 0.3s ease-in-out;
+    margin: 1rem 0;        /* Equivalent to my-4 */
+  }
+  
+  .custom-button:hover {
+    background-color: #303f9f; /* Darker shade on hover */
+  }
+  
+  .custom-button:disabled {
+    background-color: #9ea8da; /* Lighter when disabled */
+    cursor: not-allowed;
+  }
+
+  .form-container {
+    border: 1px solid #d1d5db; /* Light gray border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 1.5rem; /* Equivalent to p-6 */
+    background-color: white; /* Keep background clean */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05); /* Soft shadow (optional) */
+    width: 100%; /* Ensure it takes full width */
+    max-width: 500px; /* Optional: Restrict max width */
+  }
+  
+  
+  

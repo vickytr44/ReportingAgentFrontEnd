@@ -1,0 +1,67 @@
+<div class="center-container">
+    <form class="form-container" [formGroup]="reportForm" (ngSubmit)="generateReport()">
+        
+      <h2 class="heading-style">Generate Report</h2>
+      <div>
+        <mat-card class="card-style">
+
+            <mat-card-content>
+              <div class="label-spacing">Main Entity & Fields To Fetch</div>
+      
+              <div class="input-style">
+                <mat-form-field appearance="outline" >
+                    <mat-label>Enter main entity</mat-label>
+                    <input matInput formControlName="mainEntity" >
+                  </mat-form-field>
+              </div>
+              
+              <div class="input-style">
+                <mat-form-field appearance="outline" >
+                    <mat-label>Enter fields </mat-label>
+                    <input matInput formControlName="fields" >
+                  </mat-form-field>
+              </div>          
+            </mat-card-content>
+    
+          </mat-card>
+      </div>      
+
+      <div>
+        <mat-card class="card-style">
+            <button mat-button color="primary" (click)="addRelatedEntity()">Add Related Entity</button>
+        
+            @for (key of relatedEntitiesKeys(); track key) {
+            <mat-card-content>
+                    <div class="input-style">                      
+                      <mat-form-field appearance="outline">
+                        <mat-label>Select related entity</mat-label>
+                        <mat-select (selectionChange)="onEntityChange($event, key)">
+                            @for (relatedEntity of availableRelatedEntities; track relatedEntity) {
+                                <mat-option [value]="relatedEntity.value">
+                                  {{ relatedEntity.value }}
+                                </mat-option>
+                              }                           
+                        </mat-select>
+                      </mat-form-field>
+                
+                      <mat-form-field appearance="outline">
+                        <mat-label>Enter fields for related entity</mat-label>
+                        <input matInput [value]="relatedEntityAndFields[key]" 
+                               (input)="onValueInput($event,key)">
+                      </mat-form-field>
+                
+                      <button mat-icon-button color="warn" (click)="removeRelatedEntity(key)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+            </mat-card-content>   
+            }                 
+          </mat-card> 
+      </div>      
+
+      <button mat-raised-button color="primary" class="custom-button" type="submit" [disabled]="reportForm.invalid">
+        Generate
+      </button>
+    </form>
+  </div>
+  
