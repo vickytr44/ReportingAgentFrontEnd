@@ -30,7 +30,7 @@
         <mat-card class="card-style">
             <button mat-button color="primary" (click)="addRelatedEntity()">Add Related Entity</button>
         
-            @for (key of relatedEntitiesKeys(); track key) {
+            @for (key of relatedEntitiesKeys(); track $index; ) {
             <mat-card-content>
                     <div class="input-style">                      
                       <mat-form-field appearance="outline">
