@@ -33,16 +33,15 @@
       </div>      
 
       <div>
-        <mat-card class="card-style">
-            <button mat-button color="primary" type="button" (click)="addRelatedEntity()">Add Related Entity</button>
-        
-            @for (key of relatedEntitiesKeys(); track $index; ) {
+        <button mat-button color="primary" type="button" (click)="addRelatedEntity()">Add Related Entity</button>
+        @for (key of relatedEntitiesKeys(); track $index; ) {
+        <mat-card class="card-style">                    
             <mat-card-content>
                     <div class="input-style">                      
                       <mat-form-field appearance="outline">
                         <mat-label>Select related entity</mat-label>
                         <mat-select (selectionChange)="onRelatedEntityChange($event, key)">
-                            @for (relatedEntity of getAvailableRelatedEntities(); track relatedEntity) {
+                            @for (relatedEntity of availableRelatedEntities; track relatedEntity) {
                                 <mat-option [value]="relatedEntity.value">
                                   {{ relatedEntity.value }}
                                 </mat-option>
@@ -60,9 +59,9 @@
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>
-            </mat-card-content>   
-            }                 
+            </mat-card-content>                   
           </mat-card> 
+        } 
       </div>      
 
       <button mat-raised-button color="primary" class="custom-button" type="submit" [disabled]="reportForm.invalid">

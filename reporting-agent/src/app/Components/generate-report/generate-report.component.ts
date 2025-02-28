@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,11 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatOption, MatSelect, MatSelectChange } from '@angular/material/select';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
-interface AvailableEntity {
-  id: string;
-  value: string;
-}
+import { AvailableEntity } from '../../models/AvailableEntity';
+import { GraphqlService } from '../../services/graphql.service';
 
 @Component({
   selector: 'app-generate-report',
@@ -20,23 +17,28 @@ interface AvailableEntity {
   standalone: true
 })
 
-export class GenerateReportComponent {
+export class GenerateReportComponent implements OnInit {
   reportForm: FormGroup;
 
-  availableEntities: AvailableEntity[] = [
-    {id: 'Bill', value: 'bils'},
-  ];
+  availableEntities: AvailableEntity[] = [] ;
 
   availableRelatedEntities: AvailableEntity[] = [
     {id: 'Account', value: 'accounts'},
     {id: 'Customer', value: 'customers'},
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private graphqlService: GraphqlService) {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
       fields: ['', Validators.required],
       relatedEntityAndFields: this.fb.control({}) as FormControl<Record<string, string>>,
+    });
+  }
+
+  ngOnInit(): void {
+    this.graphqlService.getAvailableEntities().subscribe(({ data }) => {
+      console.log('Available entities:', data.availableEntities);
+      this.availableEntities = data.availableEntities;
     });
   }
 
