@@ -8,6 +8,8 @@ import { MatOption, MatSelect, MatSelectChange } from '@angular/material/select'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AvailableEntity } from '../../models/AvailableEntity';
 import { GraphqlService } from '../../services/graphql.service';
+import { AvailableField } from '../../models/AvailableField';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-generate-report',
@@ -21,24 +23,35 @@ export class GenerateReportComponent implements OnInit {
   reportForm: FormGroup;
 
   availableEntities: AvailableEntity[] = [] ;
+  availableFieldsForMainEntity: AvailableField[] = [];  
 
-  availableRelatedEntities: AvailableEntity[] = [
-    {id: 'Account', value: 'accounts'},
-    {id: 'Customer', value: 'customers'},
-  ];
+  availableFieldsForRelatedEntity: Record< string, AvailableField[]> = {};
+
+  availableRelatedEntities: AvailableEntity[] = [];
 
   constructor(private fb: FormBuilder, private graphqlService: GraphqlService) {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
-      fields: ['', Validators.required],
+      mainEntityFields: ['', Validators.required],
       relatedEntityAndFields: this.fb.control({}) as FormControl<Record<string, string>>,
     });
   }
 
   ngOnInit(): void {
     this.graphqlService.getAvailableEntities().subscribe(({ data }) => {
-      console.log('Available entities:', data.availableEntities);
       this.availableEntities = data.availableEntities;
+    });
+
+    this.reportForm.get('mainEntity')?.valueChanges
+    .pipe(filter(entity => !!entity))
+    .subscribe(entity => {
+      this.graphqlService.getAvailableFieldsFor(entity).subscribe(({ data }) => {
+        this.availableFieldsForMainEntity = data.availableFields;      
+      });
+
+      this.graphqlService.getAvailableRelatedEntities(entity).subscribe(({ data }) => {
+        this.availableRelatedEntities = data.availableRelatedEntities;
+      });
     });
   }
 
@@ -60,9 +73,14 @@ export class GenerateReportComponent implements OnInit {
     this.updateKey(key, value);
   }
 
-  onEntityChange(event: MatSelectChange) {
+  onMainEntityChange(event: MatSelectChange) {
     const value = event.value ?? '';
     this.reportForm.get('mainEntity')?.setValue(value);
+  }
+
+  onMainEntityFieldChange(event: MatSelectChange) {
+    const value = event.value ?? '';
+    this.reportForm.get('mainEntityFields')?.setValue(value);
   }
   
   onValueInput(event: Event, key: string) {

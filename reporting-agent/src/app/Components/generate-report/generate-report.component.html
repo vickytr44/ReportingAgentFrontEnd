@@ -11,7 +11,7 @@
               <div class="input-style">
                 <mat-form-field appearance="outline" >
                     <mat-label>Enter main entity</mat-label>
-                    <mat-select (selectionChange)="onEntityChange($event)">
+                    <mat-select (selectionChange)="onMainEntityChange($event)">
                         @for (entity of availableEntities; track entity) {
                             <mat-option [value]="entity.value">
                               {{ entity.value }}
@@ -23,8 +23,14 @@
               
               <div class="input-style">
                 <mat-form-field appearance="outline" >
-                    <mat-label>Enter fields </mat-label>
-                    <input matInput formControlName="fields" >
+                    <mat-label>Enter fields</mat-label>
+                    <mat-select (selectionChange)="onMainEntityFieldChange($event)" multiple>
+                      @for (entityField of availableFieldsForMainEntity; track entityField) {
+                          <mat-option [value]="entityField.name">
+                            {{ entityField.name }}
+                          </mat-option>
+                        }                           
+                  </mat-select>
                   </mat-form-field>
               </div>          
             </mat-card-content>
@@ -55,7 +61,7 @@
                                (input)="onValueInput($event,key)">
                       </mat-form-field>
                 
-                      <button mat-icon-button color="warn" (click)="removeRelatedEntity(key)">
+                      <button mat-icon-button color="warn" type="button" (click)="removeRelatedEntity(key)">
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>
