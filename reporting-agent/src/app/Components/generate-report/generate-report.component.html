@@ -31,43 +31,48 @@
                           </mat-option>
                         }                           
                   </mat-select>
-                  </mat-form-field>
+                </mat-form-field>
               </div>          
             </mat-card-content>
     
           </mat-card>
       </div>      
 
-      <div>
+      <div formArrayName="relatedEntityAndFields">
         <button mat-button color="primary" type="button" (click)="addRelatedEntity()">Add Related Entity</button>
-        @for (key of relatedEntitiesKeys(); track $index; ) {
-        <mat-card class="card-style">                    
-            <mat-card-content>
-                    <div class="input-style">                      
-                      <mat-form-field appearance="outline">
-                        <mat-label>Select related entity</mat-label>
-                        <mat-select (selectionChange)="onRelatedEntityChange($event, key)">
-                            @for (relatedEntity of availableRelatedEntities; track relatedEntity) {
-                                <mat-option [value]="relatedEntity.value">
-                                  {{ relatedEntity.value }}
-                                </mat-option>
-                              }                           
-                        </mat-select>
-                      </mat-form-field>
-                
-                      <mat-form-field appearance="outline">
-                        <mat-label>Enter fields for related entity</mat-label>
-                        <input matInput [value]="relatedEntityAndFields[key]" 
-                               (input)="onValueInput($event,key)">
-                      </mat-form-field>
-                
-                      <button mat-icon-button color="warn" type="button" (click)="removeRelatedEntity(key)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
-            </mat-card-content>                   
-          </mat-card> 
-        } 
+          @for (entityGroup of relatedEntityAndFields.controls; track $index; let i = $index) {
+            <div [formGroup]="getEntityGroup(i)">
+              <mat-card class="card-style">                    
+                  <mat-card-content>                                          
+                            <mat-form-field appearance="outline">
+                              <mat-label>Select related entity</mat-label>
+                              <mat-select formControlName="selectedEntity" (selectionChange)="onEntityChange(i)">
+                                  @for (relatedEntity of availableRelatedEntities; track relatedEntity) {
+                                      <mat-option [value]="relatedEntity.value">
+                                        {{ relatedEntity.value }}
+                                      </mat-option>
+                                    }                           
+                              </mat-select>
+                            </mat-form-field>
+                            
+                            <mat-form-field appearance="outline" class="dropdown" >
+                              <mat-label>Fields</mat-label>
+                              <mat-select formControlName="selectedFields" multiple>
+                                @for (field of availableFields[i]; track field) {
+                                  <mat-option [value]="field.name">
+                                    {{ field.name }}
+                                  </mat-option>
+                                }
+                              </mat-select>
+                            </mat-form-field>
+                      
+                            <button mat-icon-button color="warn" type="button" (click)="removeRelatedEntity(i)">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                  </mat-card-content>                   
+                </mat-card> 
+            </div>
+          } 
       </div>      
 
       <button mat-raised-button color="primary" class="custom-button" type="submit" [disabled]="reportForm.invalid">

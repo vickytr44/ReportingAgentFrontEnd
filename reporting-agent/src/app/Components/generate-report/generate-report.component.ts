@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatOption, MatSelect, MatSelectChange } from '@angular/material/select';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AvailableEntity } from '../../models/AvailableEntity';
 import { GraphqlService } from '../../services/graphql.service';
 import { AvailableField } from '../../models/AvailableField';
@@ -25,7 +25,9 @@ export class GenerateReportComponent implements OnInit {
   availableEntities: AvailableEntity[] = [] ;
   availableFieldsForMainEntity: AvailableField[] = [];  
 
-  availableFieldsForRelatedEntity: Record< string, AvailableField[]> = {};
+  entityFieldsMap: Record<string, AvailableField[]> = {};
+
+  availableFields: Record<number, AvailableField[]> = {};
 
   availableRelatedEntities: AvailableEntity[] = [];
 
@@ -33,7 +35,7 @@ export class GenerateReportComponent implements OnInit {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
       mainEntityFields: ['', Validators.required],
-      relatedEntityAndFields: this.fb.control({}) as FormControl<Record<string, string>>,
+      relatedEntityAndFields: this.fb.array([]),
     });
   }
 
@@ -55,22 +57,12 @@ export class GenerateReportComponent implements OnInit {
     });
   }
 
-  get relatedEntityAndFields() {
-    return this.reportForm.get('relatedEntityAndFields')?.value || {};
+  get relatedEntityAndFields(): FormArray {
+    return this.reportForm.get('relatedEntityAndFields') as FormArray;
   }
 
-  relatedEntitiesKeys(): string[] {
-    return Object.keys(this.relatedEntityAndFields);
-  }
-
-  addRelatedEntity() {
-    const updatedEntities = { ...this.relatedEntityAndFields, '': '' };
-    this.reportForm.get('relatedEntityAndFields')?.setValue(updatedEntities);
-  }
-
-  onRelatedEntityChange(event: MatSelectChange, key: string) {
-    const value = event.value ?? '';
-    this.updateKey(key, value);
+  getEntityGroup(index: number): FormGroup {
+    return this.relatedEntityAndFields.at(index) as FormGroup;
   }
 
   onMainEntityChange(event: MatSelectChange) {
@@ -83,30 +75,36 @@ export class GenerateReportComponent implements OnInit {
     this.reportForm.get('mainEntityFields')?.setValue(value);
   }
   
-  onValueInput(event: Event, key: string) {
-    const inputValue = (event.target as HTMLInputElement).value;
-    this.updateValue(key, inputValue);
+  addRelatedEntity() {
+    const entityGroup = this.fb.group({
+      selectedEntity: new FormControl(),
+      selectedFields: new FormControl([])
+    });
+
+    this.relatedEntityAndFields.push(entityGroup);
   }
 
-  updateKey(oldKey: string, newKey: string) {
-    if (!newKey || oldKey === newKey) return;
-  
-    const updatedEntities = { ...this.relatedEntityAndFields };
-    updatedEntities[newKey] = updatedEntities[oldKey]; // Copy value to new key
-    delete updatedEntities[oldKey]; // Remove old key
-  
-    this.reportForm.patchValue({ relatedEntityAndFields: updatedEntities });
+  removeRelatedEntity(index: number) {
+    this.relatedEntityAndFields.removeAt(index);
+    delete this.availableFields[index]; // Remove associated fields
   }
 
-  updateValue(key: string, value: string) {
-    const updatedEntities = { ...this.relatedEntityAndFields, [key]: value };
-    this.reportForm.get('relatedEntityAndFields')?.setValue(updatedEntities);
-  }
+  onEntityChange(index: number) {
+    const selectedEntity = this.relatedEntityAndFields.at(index).get('selectedEntity')?.value;
 
-  removeRelatedEntity(key: string) {
-    const updatedEntities = { ...this.relatedEntityAndFields };
-    delete updatedEntities[key];
-    this.reportForm.get('relatedEntityAndFields')?.setValue(updatedEntities);
+    if(this.entityFieldsMap[selectedEntity])
+    {
+      this.availableFields[index] = this.entityFieldsMap[selectedEntity];
+      return;
+    }
+
+    this.graphqlService.getAvailableFieldsFor(selectedEntity).subscribe(({ data }) => {
+          this.entityFieldsMap[selectedEntity] = data.availableFields;
+          this.availableFields[index] = this.entityFieldsMap[selectedEntity];
+          console.log("reached here", selectedEntity)
+        })
+
+    this.relatedEntityAndFields.at(index).get('selectedFields')?.setValue([]); // Reset fields when entity changes
   }
 
   generateReport() {
