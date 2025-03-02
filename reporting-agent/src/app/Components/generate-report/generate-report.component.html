@@ -47,7 +47,7 @@
                 <mat-card-content>                                          
                           <mat-form-field appearance="outline">
                             <mat-label>Select related entity</mat-label>
-                            <mat-select formControlName="selectedEntity" (selectionChange)="onEntityChange(i)">
+                            <mat-select formControlName="selectedEntity" (selectionChange)="onRelatedEntityChange(i)">
                                 @for (relatedEntity of availableRelatedEntities; track relatedEntity) {
                                     <mat-option [value]="relatedEntity.value">
                                       {{ relatedEntity.value }}

@@ -93,7 +93,7 @@ export class GenerateReportComponent implements OnInit {
     delete this.availableFields[index]; // Remove associated fields
   }
 
-  onEntityChange(index: number) {
+  onRelatedEntityChange(index: number) {
     const selectedEntity = this.relatedEntityAndFields.at(index).get('selectedEntity')?.value;
 
     if(this.entityFieldsMap[selectedEntity])
