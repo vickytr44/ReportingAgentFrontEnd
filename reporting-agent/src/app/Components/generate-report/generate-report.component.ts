@@ -61,6 +61,10 @@ export class GenerateReportComponent implements OnInit {
     return this.reportForm.get('relatedEntityAndFields') as FormArray;
   }
 
+  showRelatedEntityCard(): boolean{
+    return this.relatedEntityAndFields.length !== 0;
+  }
+
   getEntityGroup(index: number): FormGroup {
     return this.relatedEntityAndFields.at(index) as FormGroup;
   }
