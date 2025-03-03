@@ -27,7 +27,7 @@ export class GenerateReportComponent implements OnInit {
 
   entityFieldsMap: Record<string, AvailableField[]> = {};
 
-  availableFields: Record<number, AvailableField[]> = {};
+  availableFieldsForRelatedEntity: Record<number, AvailableField[]> = {};
 
   availableRelatedEntities: AvailableEntity[] = [];
 
@@ -48,7 +48,8 @@ export class GenerateReportComponent implements OnInit {
     .pipe(filter(entity => !!entity))
     .subscribe(entity => {
       this.graphqlService.getAvailableFieldsFor(entity).subscribe(({ data }) => {
-        this.availableFieldsForMainEntity = data.availableFields;      
+        this.entityFieldsMap[entity] = data.availableFields;
+        this.availableFieldsForMainEntity = this.entityFieldsMap[entity];      
       });
 
       this.graphqlService.getAvailableRelatedEntities(entity).subscribe(({ data }) => {
@@ -65,7 +66,7 @@ export class GenerateReportComponent implements OnInit {
     return this.relatedEntityAndFields.length !== 0;
   }
 
-  getEntityGroup(index: number): FormGroup {
+  getRelatedEntityGroup(index: number): FormGroup {
     return this.relatedEntityAndFields.at(index) as FormGroup;
   }
 
@@ -90,7 +91,7 @@ export class GenerateReportComponent implements OnInit {
 
   removeRelatedEntity(index: number) {
     this.relatedEntityAndFields.removeAt(index);
-    delete this.availableFields[index]; // Remove associated fields
+    delete this.availableFieldsForRelatedEntity[index]; // Remove associated fields
   }
 
   onRelatedEntityChange(index: number) {
@@ -98,13 +99,13 @@ export class GenerateReportComponent implements OnInit {
 
     if(this.entityFieldsMap[selectedEntity])
     {
-      this.availableFields[index] = this.entityFieldsMap[selectedEntity];
+      this.availableFieldsForRelatedEntity[index] = this.entityFieldsMap[selectedEntity];
       return;
     }
 
     this.graphqlService.getAvailableFieldsFor(selectedEntity).subscribe(({ data }) => {
           this.entityFieldsMap[selectedEntity] = data.availableFields;
-          this.availableFields[index] = this.entityFieldsMap[selectedEntity];
+          this.availableFieldsForRelatedEntity[index] = this.entityFieldsMap[selectedEntity];
           console.log("reached here", selectedEntity)
         })
 

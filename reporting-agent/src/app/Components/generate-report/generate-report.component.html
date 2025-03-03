@@ -43,7 +43,7 @@
         @if(showRelatedEntityCard()){
           <mat-card class="card-style"> 
             @for (entityGroup of relatedEntityAndFields.controls; track $index; let i = $index) {
-              <div [formGroup]="getEntityGroup(i)">                   
+              <div [formGroup]="getRelatedEntityGroup(i)">                   
                 <mat-card-content>                                          
                           <mat-form-field appearance="outline">
                             <mat-label>Select related entity</mat-label>
@@ -59,7 +59,7 @@
                           <mat-form-field appearance="outline" class="dropdown" >
                             <mat-label>Fields</mat-label>
                             <mat-select formControlName="selectedFields" multiple>
-                              @for (field of availableFields[i]; track field) {
+                              @for (field of availableFieldsForRelatedEntity[i]; track field) {
                                 <mat-option [value]="field.name">
                                   {{ field.name }}
                                 </mat-option>
