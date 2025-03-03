@@ -77,6 +77,61 @@
       }
       </div>      
 
+      <div formArrayName="andConditions">
+        <button mat-button color="primary" type="button" (click)="addAndCondition()">Add And Condition</button>
+        @if(showAndFilterCard()){
+          <mat-card class="card-style"> 
+            @for (entityGroup of andConditions.controls; track $index; let i = $index) {
+              <div [formGroup]="getAndFilterEntityGroup(i)">                   
+                <mat-card-content>                                          
+                          <mat-form-field appearance="outline">
+                            <mat-label>Select entity</mat-label>
+                            <mat-select formControlName="selectedEntity" (selectionChange)="onAndConditionEntityChange(i)">
+                                @for (filterEntity of availableEntitiesForFilterAndSort(); track filterEntity) {
+                                    <mat-option [value]="filterEntity.value">
+                                      {{ filterEntity.value }}
+                                    </mat-option>
+                                  }                           
+                            </mat-select>
+                          </mat-form-field>
+                          
+                          <mat-form-field appearance="outline" class="dropdown" >
+                            <mat-label>Fields</mat-label>
+                            <mat-select formControlName="selectedFields" (selectionChange)="onAndConditionFieldChange(i)">
+                              @for (field of availableFieldsForAndCondition[i]; track field) {
+                                <mat-option [value]="field.name">
+                                  {{ field.name }}
+                                </mat-option>
+                              }
+                            </mat-select>
+                          </mat-form-field>
+
+                          <mat-form-field appearance="outline" class="dropdown" >
+                            <mat-label>Operators</mat-label>
+                            <mat-select formControlName="selectedOperator">
+                              @for (operator of availableOperatorsForAndCondition[i]; track operator) {
+                                <mat-option [value]="operator.symbol">
+                                  {{ operator.symbol }}
+                                </mat-option>
+                              }
+                            </mat-select>
+                          </mat-form-field>
+
+                          <mat-form-field appearance="outline" >
+                            <mat-label>Enter value</mat-label>
+                            <input matInput formControlName="value" >
+                          </mat-form-field>
+                    
+                          <button mat-icon-button color="warn" type="button" (click)="removeAndCondition(i)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                </mat-card-content>    
+              </div>
+            }                
+        </mat-card> 
+      }
+      </div> 
+
       <button mat-raised-button color="primary" class="custom-button" type="submit" [disabled]="reportForm.invalid">
         Generate
       </button>

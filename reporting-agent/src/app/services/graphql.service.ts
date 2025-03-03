@@ -54,4 +54,19 @@ export class GraphqlService {
       query: GET_Available_Entity_Fields
     }).valueChanges;
   }
+
+  getAvailableOperatorFor(type : string): Observable<any> {
+    const GET_Available_Operators = gql`
+      query typeOperators {
+        availableOperators(type: "${type}") {
+          name
+          symbol
+        }
+      }
+    `;
+
+    return this.apollo.watchQuery<any>({
+      query: GET_Available_Operators
+    }).valueChanges;
+  }
 }

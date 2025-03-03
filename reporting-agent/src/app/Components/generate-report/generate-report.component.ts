@@ -10,6 +10,7 @@ import { AvailableEntity } from '../../models/AvailableEntity';
 import { GraphqlService } from '../../services/graphql.service';
 import { AvailableField } from '../../models/AvailableField';
 import { filter } from 'rxjs';
+import { AvailableOperator } from '../../models/AvailableOperator';
 
 @Component({
   selector: 'app-generate-report',
@@ -22,20 +23,25 @@ import { filter } from 'rxjs';
 export class GenerateReportComponent implements OnInit {
   reportForm: FormGroup;
 
+  entityFieldsMap: Record<string, AvailableField[]> = {};
+
+  typeOperatorMap: Record<string, AvailableOperator[]> = {};
+
   availableEntities: AvailableEntity[] = [] ;
   availableFieldsForMainEntity: AvailableField[] = [];  
 
-  entityFieldsMap: Record<string, AvailableField[]> = {};
-
-  availableFieldsForRelatedEntity: Record<number, AvailableField[]> = {};
-
   availableRelatedEntities: AvailableEntity[] = [];
+  availableFieldsForRelatedEntity: Record<number, AvailableField[]> = {};
+  
+  availableFieldsForAndCondition: Record<number, AvailableField[]> = {};
+  availableOperatorsForAndCondition: Record<number, AvailableOperator[]> = {};
 
   constructor(private fb: FormBuilder, private graphqlService: GraphqlService) {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
       mainEntityFields: ['', Validators.required],
       relatedEntityAndFields: this.fb.array([]),
+      andConditions: this.fb.array([]),
     });
   }
 
@@ -58,18 +64,19 @@ export class GenerateReportComponent implements OnInit {
     });
   }
 
+  get mainEntity(): FormControl {
+    return this.reportForm.get('mainEntity') as FormControl;
+  }
+
   get relatedEntityAndFields(): FormArray {
     return this.reportForm.get('relatedEntityAndFields') as FormArray;
   }
 
-  showRelatedEntityCard(): boolean{
-    return this.relatedEntityAndFields.length !== 0;
+  get andConditions(): FormArray {
+    return this.reportForm.get('andConditions') as FormArray;
   }
 
-  getRelatedEntityGroup(index: number): FormGroup {
-    return this.relatedEntityAndFields.at(index) as FormGroup;
-  }
-
+  //main entity
   onMainEntityChange(event: MatSelectChange) {
     const value = event.value ?? '';
     this.reportForm.get('mainEntity')?.setValue(value);
@@ -78,6 +85,15 @@ export class GenerateReportComponent implements OnInit {
   onMainEntityFieldChange(event: MatSelectChange) {
     const value = event.value ?? '';
     this.reportForm.get('mainEntityFields')?.setValue(value);
+  }
+
+  //realted entity
+  showRelatedEntityCard(): boolean{
+    return this.relatedEntityAndFields.length !== 0;
+  }
+
+  getRelatedEntityGroup(index: number): FormGroup {
+    return this.relatedEntityAndFields.at(index) as FormGroup;
   }
   
   addRelatedEntity() {
@@ -106,10 +122,79 @@ export class GenerateReportComponent implements OnInit {
     this.graphqlService.getAvailableFieldsFor(selectedEntity).subscribe(({ data }) => {
           this.entityFieldsMap[selectedEntity] = data.availableFields;
           this.availableFieldsForRelatedEntity[index] = this.entityFieldsMap[selectedEntity];
-          console.log("reached here", selectedEntity)
         })
 
     this.relatedEntityAndFields.at(index).get('selectedFields')?.setValue([]); // Reset fields when entity changes
+  }
+
+
+  //And conditions
+  availableEntitiesForFilterAndSort() : AvailableEntity[]{
+    const mainEntity = this.availableEntities.filter(x => x.value === this.mainEntity.value)
+    return [...this.availableRelatedEntities, ...mainEntity];
+  }
+
+  showAndFilterCard(): boolean{
+    return this.andConditions.length !== 0;
+  }
+
+  getAndFilterEntityGroup(index: number): FormGroup {
+    return this.andConditions.at(index) as FormGroup;
+  }
+
+  addAndCondition() {
+    const entityGroup = this.fb.group({
+      selectedEntity: new FormControl(),
+      selectedFields: new FormControl(),
+      selectedOperator: new FormControl(),
+      value: new FormControl()
+    });
+
+    this.andConditions.push(entityGroup);
+  }
+
+  removeAndCondition(index: number) {
+    this.andConditions.removeAt(index);
+    delete this.availableFieldsForAndCondition[index]; // Remove associated fields
+    delete this.availableOperatorsForAndCondition[index]; // Remove associated operator
+  }
+
+  onAndConditionEntityChange(index: number) {
+    const selectedEntity = this.andConditions.at(index).get('selectedEntity')?.value;
+
+    if(this.entityFieldsMap[selectedEntity])
+    {
+      this.availableFieldsForAndCondition[index] = this.entityFieldsMap[selectedEntity];
+      return;
+    }
+
+    this.graphqlService.getAvailableFieldsFor(selectedEntity).subscribe(({ data }) => {
+          this.entityFieldsMap[selectedEntity] = data.availableFields;
+          this.availableFieldsForAndCondition[index] = this.entityFieldsMap[selectedEntity];
+        })
+
+    this.andConditions.at(index).get('selectedFields')?.setValue(''); // Reset fields when entity changes
+    this.andConditions.at(index).get('selectedOperator')?.setValue(''); // Reset operator when entity changes
+    this.andConditions.at(index).get('value')?.setValue(''); // Reset operator when entity changes
+  }
+
+  onAndConditionFieldChange(index: number) {
+    const selectedField = this.andConditions.at(index).get('selectedFields')?.value;
+    const selectedFieldType = selectedField.type;
+
+    if(this.typeOperatorMap[selectedField])
+    {
+      this.availableOperatorsForAndCondition[index] = this.typeOperatorMap[selectedFieldType];
+      return;
+    }
+
+    this.graphqlService.getAvailableOperatorFor(selectedFieldType).subscribe(({ data }) => {
+          this.typeOperatorMap[selectedFieldType] = data.availableOperators;
+          this.availableOperatorsForAndCondition[index] = this.typeOperatorMap[selectedFieldType];
+        })
+
+    this.andConditions.at(index).get('selectedOperator')?.setValue(''); // Reset fields when entity changes
+    this.andConditions.at(index).get('value')?.setValue(''); // Reset fields when entity changes
   }
 
   generateReport() {
