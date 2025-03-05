@@ -55,12 +55,11 @@ export class GraphqlService {
     }).valueChanges;
   }
 
-  getAvailableOperatorFor(type : string): Observable<any> {
+  getAvailableOperatorFor(entity : string, field: string): Observable<any> {
     const GET_Available_Operators = gql`
       query typeOperators {
-        availableOperators(type: "${type}") {
+        availableOperators(entity: "${entity}", field: "${field}") {
           name
-          symbol
         }
       }
     `;

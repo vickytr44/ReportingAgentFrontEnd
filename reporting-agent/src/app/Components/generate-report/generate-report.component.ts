@@ -25,7 +25,7 @@ export class GenerateReportComponent implements OnInit {
 
   entityFieldsMap: Record<string, AvailableField[]> = {};
 
-  typeOperatorMap: Record<string, AvailableOperator[]> = {};
+  fieldOperatorMap: Record<string, AvailableOperator[]> = {};
 
   availableEntities: AvailableEntity[] = [] ;
   availableFieldsForMainEntity: AvailableField[] = [];  
@@ -179,18 +179,20 @@ export class GenerateReportComponent implements OnInit {
   }
 
   onAndConditionFieldChange(index: number) {
+    const selectedEntity = this.andConditions.at(index).get('selectedEntity')?.value;
     const selectedField = this.andConditions.at(index).get('selectedFields')?.value;
-    const selectedFieldType = selectedField.type;
 
-    if(this.typeOperatorMap[selectedField])
+    const fieldOperatorMapkey = selectedEntity + '-' + selectedField
+
+    if(this.fieldOperatorMap[fieldOperatorMapkey])
     {
-      this.availableOperatorsForAndCondition[index] = this.typeOperatorMap[selectedFieldType];
+      this.availableOperatorsForAndCondition[index] = this.fieldOperatorMap[fieldOperatorMapkey];
       return;
     }
 
-    this.graphqlService.getAvailableOperatorFor(selectedFieldType).subscribe(({ data }) => {
-          this.typeOperatorMap[selectedFieldType] = data.availableOperators;
-          this.availableOperatorsForAndCondition[index] = this.typeOperatorMap[selectedFieldType];
+    this.graphqlService.getAvailableOperatorFor(selectedEntity, selectedField).subscribe(({ data }) => {
+          this.fieldOperatorMap[fieldOperatorMapkey] = data.availableOperators;
+          this.availableOperatorsForAndCondition[index] = this.fieldOperatorMap[fieldOperatorMapkey];
         })
 
     this.andConditions.at(index).get('selectedOperator')?.setValue(''); // Reset fields when entity changes

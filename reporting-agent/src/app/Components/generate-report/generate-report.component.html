@@ -110,8 +110,8 @@
                             <mat-label>Operators</mat-label>
                             <mat-select formControlName="selectedOperator">
                               @for (operator of availableOperatorsForAndCondition[i]; track operator) {
-                                <mat-option [value]="operator.symbol">
-                                  {{ operator.symbol }}
+                                <mat-option [value]="operator.name">
+                                  {{ operator.name }}
                                 </mat-option>
                               }
                             </mat-select>
