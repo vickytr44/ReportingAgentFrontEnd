@@ -11,6 +11,7 @@ import { GraphqlService } from '../../services/graphql.service';
 import { AvailableField } from '../../models/AvailableField';
 import { filter } from 'rxjs';
 import { AvailableOperator } from '../../models/AvailableOperator';
+import { transformToPayload } from  '../../utils/transformer';
 
 @Component({
   selector: 'app-generate-report',
@@ -332,7 +333,7 @@ export class GenerateReportComponent implements OnInit {
 
   generateReport() {
     if (this.reportForm.valid) {
-      console.log('Generating report with:', this.reportForm.value);
+      console.log('Generating report with:', transformToPayload(this.reportForm.value));
     } else {
       console.log('Form is invalid!');
     }
