@@ -39,7 +39,9 @@
       </div>      
 
       <div formArrayName="relatedEntityAndFields">
-        <button mat-button color="primary" type="button" (click)="addRelatedEntity()">Add Related Entity</button>
+        @if(showAddRelatedEntityButton()){
+          <button mat-button color="primary" type="button" (click)="addRelatedEntity()">Add Related Entity</button>
+        }
         @if(showRelatedEntityCard()){
           <mat-card class="card-style"> 
             @for (entityGroup of relatedEntityAndFields.controls; track $index; let i = $index) {
@@ -178,6 +180,50 @@
                           </mat-form-field>
                     
                           <button mat-icon-button color="warn" type="button" (click)="removeOrCondition(i)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                </mat-card-content>    
+              </div>
+            }                
+        </mat-card> 
+      }
+      </div>
+
+      <div formArrayName="sortConditions">
+        <button mat-button color="primary" type="button" (click)="addSortCondition()">Add Sort Condition</button>
+        @if(showSortFilterCard()){
+          <mat-card class="card-style"> 
+            @for (entityGroup of sortConditions.controls; track $index; let i = $index) {
+              <div [formGroup]="getSortEntityGroup(i)">                   
+                <mat-card-content>                                          
+                          <mat-form-field appearance="outline">
+                            <mat-label>Select entity</mat-label>
+                            <mat-select formControlName="selectedEntity" (selectionChange)="onSortConditionEntityChange(i)">
+                                @for (filterEntity of availableEntitiesForFilterAndSort(); track filterEntity) {
+                                    <mat-option [value]="filterEntity.value">
+                                      {{ filterEntity.value }}
+                                    </mat-option>
+                                  }                           
+                            </mat-select>
+                          </mat-form-field>
+                          
+                          <mat-form-field appearance="outline" class="dropdown" >
+                            <mat-label>Fields</mat-label>
+                            <mat-select formControlName="selectedFields" (selectionChange)="onSortConditionFieldChange(i)">
+                              @for (field of availableFieldsForSortCondition[i]; track field) {
+                                <mat-option [value]="field.name">
+                                  {{ field.name }}
+                                </mat-option>
+                              }
+                            </mat-select>
+                          </mat-form-field>
+
+                          <mat-form-field appearance="outline" >
+                            <mat-label>Enter value</mat-label>
+                            <input matInput formControlName="value" >
+                          </mat-form-field>
+                    
+                          <button mat-icon-button color="warn" type="button" (click)="removeSortCondition(i)">
                             <mat-icon>delete</mat-icon>
                           </button>
                 </mat-card-content>    

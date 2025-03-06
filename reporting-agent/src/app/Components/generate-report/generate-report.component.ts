@@ -39,6 +39,8 @@ export class GenerateReportComponent implements OnInit {
   availableFieldsForOrCondition: Record<number, AvailableField[]> = {};
   availableOperatorsForOrCondition: Record<number, AvailableOperator[]> = {};
 
+  availableFieldsForSortCondition: Record<number, AvailableField[]> = {};
+
   constructor(private fb: FormBuilder, private graphqlService: GraphqlService) {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
@@ -46,6 +48,7 @@ export class GenerateReportComponent implements OnInit {
       relatedEntityAndFields: this.fb.array([]),
       andConditions: this.fb.array([]),
       orConditions: this.fb.array([]),
+      sortConditions: this.fb.array([]),
     });
   }
 
@@ -84,6 +87,10 @@ export class GenerateReportComponent implements OnInit {
     return this.reportForm.get('orConditions') as FormArray;
   }
 
+  get sortConditions(): FormArray {
+    return this.reportForm.get('sortConditions') as FormArray;
+  }
+
   //main entity
   onMainEntityChange(event: MatSelectChange) {
     const value = event.value ?? '';
@@ -96,6 +103,10 @@ export class GenerateReportComponent implements OnInit {
   }
 
   //realted entity
+  showAddRelatedEntityButton(): boolean{
+    return this.availableRelatedEntities.length !== 0;
+  }
+
   showRelatedEntityCard(): boolean{
     return this.relatedEntityAndFields.length !== 0;
   }
@@ -271,6 +282,52 @@ export class GenerateReportComponent implements OnInit {
 
     this.orConditions.at(index).get('selectedOperator')?.setValue(''); // Reset fields when entity changes
     this.orConditions.at(index).get('value')?.setValue(''); // Reset fields when entity changes
+  }
+
+  //sort conditions
+  showSortFilterCard(): boolean{
+    return this.sortConditions.length !== 0;
+  }
+
+  getSortEntityGroup(index: number): FormGroup {
+    return this.sortConditions.at(index) as FormGroup;
+  }
+
+  addSortCondition() {
+    const entityGroup = this.fb.group({
+      selectedEntity: new FormControl(),
+      selectedFields: new FormControl(),
+      value: new FormControl()
+    });
+
+    this.sortConditions.push(entityGroup);
+  }
+
+  removeSortCondition(index: number) {
+    this.sortConditions.removeAt(index);
+    delete this.availableFieldsForSortCondition[index]; // Remove associated fields
+  }
+
+  onSortConditionEntityChange(index: number) {
+    const selectedEntity = this.sortConditions.at(index).get('selectedEntity')?.value;
+
+    if(this.entityFieldsMap[selectedEntity])
+    {
+      this.availableFieldsForSortCondition[index] = this.entityFieldsMap[selectedEntity];
+      return;
+    }
+
+    this.graphqlService.getAvailableFieldsFor(selectedEntity).subscribe(({ data }) => {
+          this.entityFieldsMap[selectedEntity] = data.availableFields;
+          this.availableFieldsForSortCondition[index] = this.entityFieldsMap[selectedEntity];
+        })
+
+    this.sortConditions.at(index).get('selectedFields')?.setValue(''); // Reset fields when entity changes
+    this.sortConditions.at(index).get('value')?.setValue(''); // Reset operator when entity changes
+  }
+
+  onSortConditionFieldChange(index: number) {
+    this.sortConditions.at(index).get('value')?.setValue(''); // Reset fields when entity changes
   }
 
   generateReport() {
