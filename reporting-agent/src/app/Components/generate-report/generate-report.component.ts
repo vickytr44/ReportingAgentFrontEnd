@@ -8,6 +8,7 @@ import { MatOption, MatSelect, MatSelectChange } from '@angular/material/select'
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AvailableEntity } from '../../models/AvailableEntity';
 import { GraphqlService } from '../../services/graphql.service';
+import { RestService } from '../../services/rest.service';
 import { AvailableField } from '../../models/AvailableField';
 import { filter } from 'rxjs';
 import { AvailableOperator } from '../../models/AvailableOperator';
@@ -42,7 +43,7 @@ export class GenerateReportComponent implements OnInit {
 
   availableFieldsForSortCondition: Record<number, AvailableField[]> = {};
 
-  constructor(private fb: FormBuilder, private graphqlService: GraphqlService) {
+  constructor(private fb: FormBuilder, private graphqlService: GraphqlService, private restService: RestService) {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
       mainEntityFields: ['', Validators.required],
@@ -333,7 +334,16 @@ export class GenerateReportComponent implements OnInit {
 
   generateReport() {
     if (this.reportForm.valid) {
+      const payload = transformToPayload(this.reportForm.value);
       console.log('Generating report with:', transformToPayload(this.reportForm.value));
+      this.restService.generateReport(payload).subscribe({
+        next: (response) => {
+          console.log('Success:', response);
+        },
+        error: (error) => {
+          console.error('Error:', error);
+        }
+      });
     } else {
       console.log('Form is invalid!');
     }
