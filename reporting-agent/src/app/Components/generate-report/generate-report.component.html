@@ -82,6 +82,7 @@
       <div formArrayName="andConditions">
         <button mat-button color="primary" type="button" (click)="addAndCondition()">Add And Condition</button>
         @if(showAndFilterCard()){
+          <span>(All conditions must be true)</span>
           <mat-card class="card-style"> 
             @for (entityGroup of andConditions.controls; track $index; let i = $index) {
               <div [formGroup]="getAndFilterEntityGroup(i)">                   
@@ -137,6 +138,7 @@
       <div formArrayName="orConditions">
         <button mat-button color="primary" type="button" (click)="addOrCondition()">Add Or Condition</button>
         @if(showOrFilterCard()){
+          <span >(Any of the conditions must be true)</span>
           <mat-card class="card-style"> 
             @for (entityGroup of orConditions.controls; track $index; let i = $index) {
               <div [formGroup]="getOrFilterEntityGroup(i)">                   
