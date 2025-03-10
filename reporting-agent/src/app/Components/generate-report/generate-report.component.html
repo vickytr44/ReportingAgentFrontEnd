@@ -1,5 +1,5 @@
 <div class="center-container">
-    <form class="form-container" [formGroup]="reportForm" (ngSubmit)="generateReport()">
+    <form class="form-container" [formGroup]="reportForm">
         
       <h2 class="heading-style">Generate Report</h2>
       <div>
@@ -235,9 +235,16 @@
       }
       </div>
 
-      <button mat-raised-button color="primary" class="custom-button" type="submit" [disabled]="reportForm.invalid">
+      <button mat-raised-button color="primary" class="custom-button" type="submit" [disabled]="reportForm.invalid" (click)="generateReport()">
         Generate
       </button>
+
+      @if(isDownloadReady) {
+        <p>✅ A report is available for download.</p>
+        <button mat-raised-button color="accent" (click)="downloadPDF()">
+          <mat-icon>cloud_download</mat-icon> Download PDF
+        </button>
+      }
     </form>
   </div>
   

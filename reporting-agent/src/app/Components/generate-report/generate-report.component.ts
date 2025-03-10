@@ -43,6 +43,9 @@ export class GenerateReportComponent implements OnInit {
 
   availableFieldsForSortCondition: Record<number, AvailableField[]> = {};
 
+  isDownloadReady = false;
+  pdfUrl : string|null = null;
+
   constructor(private fb: FormBuilder, private graphqlService: GraphqlService, private restService: RestService) {
     this.reportForm = this.fb.group({
       mainEntity: ['', Validators.required],
@@ -334,18 +337,38 @@ export class GenerateReportComponent implements OnInit {
 
   generateReport() {
     if (this.reportForm.valid) {
+      this.isDownloadReady = false;
       const payload = transformToPayload(this.reportForm.value);
-      console.log('Generating report with:', transformToPayload(this.reportForm.value));
+      console.log(
+        'Generating report with:',
+        transformToPayload(this.reportForm.value)
+      );
       this.restService.generateReport(payload).subscribe({
-        next: (response) => {
-          console.log('Success:', response);
+        next: (response: Blob) => {
+          console.log('Success');
+          this.pdfUrl = window.URL.createObjectURL(response);
+          this.isDownloadReady = true;
         },
         error: (error) => {
+          this.isDownloadReady = false;
           console.error('Error:', error);
-        }
+        },
       });
     } else {
       console.log('Form is invalid!');
+    }
+  }
+
+  downloadPDF() {
+    if (this.pdfUrl) {
+      const a = document.createElement('a');
+      a.href = this.pdfUrl!;
+      a.download = 'report.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      window.open(this.pdfUrl!, '_blank'); // Opens in a new tab
     }
   }
 }

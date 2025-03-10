@@ -10,7 +10,9 @@ export class RestService {
 
   constructor(private http: HttpClient) {}
 
-  generateReport(payload: any): Observable<any> {
-    return this.http.post(this.apiUrl, payload);
+  generateReport(payload: any): Observable<Blob> {
+    return this.http.post(this.apiUrl, payload, {
+      responseType: 'blob', // Expecting binary data
+    });
   }
 }
