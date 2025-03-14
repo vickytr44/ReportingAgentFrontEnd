@@ -4,6 +4,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatOption, MatSelect, MatSelectChange } from '@angular/material/select';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AvailableEntity } from '../../models/AvailableEntity';
@@ -16,7 +17,7 @@ import { transformToPayload } from  '../../utils/transformer';
 
 @Component({
   selector: 'app-generate-report',
-  imports: [ReactiveFormsModule,MatCardModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatIconModule, MatOption, MatSelect],
+  imports: [ReactiveFormsModule, MatCardModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatOption, MatSelect],
   templateUrl: './generate-report.component.html',
   styleUrl: './generate-report.component.scss',
   standalone: true
@@ -44,6 +45,7 @@ export class GenerateReportComponent implements OnInit {
   availableFieldsForSortCondition: Record<number, AvailableField[]> = {};
 
   isDownloadReady = false;
+  isLoading = false;
   pdfUrl : string|null = null;
 
   constructor(private fb: FormBuilder, private graphqlService: GraphqlService, private restService: RestService) {
@@ -337,6 +339,7 @@ export class GenerateReportComponent implements OnInit {
 
   generateReport() {
     if (this.reportForm.valid) {
+      this.isLoading = true;
       this.isDownloadReady = false;
       const payload = transformToPayload(this.reportForm.value);
       console.log(
@@ -348,10 +351,12 @@ export class GenerateReportComponent implements OnInit {
           console.log('Success');
           this.pdfUrl = window.URL.createObjectURL(response);
           this.isDownloadReady = true;
+          this.isLoading = false;
         },
         error: (error) => {
           this.isDownloadReady = false;
           console.error('Error:', error);
+          this.isLoading = false;
         },
       });
     } else {

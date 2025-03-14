@@ -35,18 +35,12 @@
     padding: 0.75rem 1rem; /* Comfortable padding */
     font-size: 1rem;       /* Readable text size */
     font-weight: 600;      /* Semi-bold text */
-    color: white;          /* White text */
-    background-color: #3f51b5; /* Material primary color */
     border: none;          /* Remove border */
     border-radius: 6px;    /* Slightly rounded corners */
     cursor: pointer;       /* Pointer on hover */
-    transition: background 0.3s ease-in-out;
     margin: 1rem 0;        /* Equivalent to my-4 */
   }
   
-  .custom-button:hover {
-    background-color: #303f9f; /* Darker shade on hover */
-  }
   
   .custom-button:disabled {
     background-color: #9ea8da; /* Lighter when disabled */
