@@ -26,24 +26,40 @@ type Condition = {
   };
   
   export const transformToPayload = (data: InputData) => {
-    return {
+    const payload: any = {
       main_entity: data.mainEntity,
       fields_to_fetch_from_main_entity: data.mainEntityFields.join(", "),
-      or_conditions: data.orConditions.map(
-        (c) => `${c.selectedEntity}.${c.selectedFields} ${c.selectedOperator} '${c.value}'`
-      ),
-      and_conditions: data.andConditions.map(
-        (c) => `${c.selectedEntity} ${c.selectedFields} ${c.selectedOperator} '${c.value}'`
-      ),
-      related_entity_fields: Object.fromEntries(
-        data.relatedEntityAndFields.map((r) => [
-          `${r.selectedEntity}`, `${r.selectedFields.join(", ")}`,
-        ])
-      ),
-      sort_field_order: Object.fromEntries(
-        data.sortConditions.map((s) => [
-          `${s.selectedEntity} ${s.selectedFields}`, `${s.value}`,
-        ])
-      ),
     };
+  
+    if (data.orConditions?.length) {
+      payload.or_conditions = data.orConditions.map(
+        (c) => `${c.selectedEntity}.${c.selectedFields} ${c.selectedOperator} '${c.value}'`
+      );
+    }
+  
+    if (data.andConditions?.length) {
+      payload.and_conditions = data.andConditions.map(
+        (c) => `${c.selectedEntity}.${c.selectedFields} ${c.selectedOperator} '${c.value}'`
+      );
+    }
+  
+    if (data.relatedEntityAndFields?.length) {
+      payload.related_entity_fields = Object.fromEntries(
+        data.relatedEntityAndFields.map((r) => [
+          r.selectedEntity,
+          r.selectedFields.join(", "),
+        ])
+      );
+    }
+  
+    if (data.sortConditions?.length) {
+      payload.sort_field_order = Object.fromEntries(
+        data.sortConditions.map((s) => [
+          `${s.selectedEntity} ${s.selectedFields}`,
+          s.value,
+        ])
+      );
+    }
+  
+    return payload;
   };
