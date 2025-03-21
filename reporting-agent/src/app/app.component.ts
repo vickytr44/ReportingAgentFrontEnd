@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { GenerateReportComponent } from './Components/generate-report/generate-report.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [GenerateReportComponent],
+  imports: [RouterModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

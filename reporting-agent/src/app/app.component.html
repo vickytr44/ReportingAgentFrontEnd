@@ -1,1 +1,12 @@
-<app-generate-report></app-generate-report>
+<header class="header">
+    <h1>Reporting Dashboard</h1>
+    <nav>
+      <a routerLink="/report" routerLinkActive="active">Generate Report</a>
+      <a routerLink="/graph" routerLinkActive="active">Generate Bar Graph</a>
+    </nav>
+  </header>
+  
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+  
