@@ -18,6 +18,8 @@ type Condition = {
   
   type InputData = {
     mainEntity: string;
+    xField: string;
+    yField: string;
     mainEntityFields: string[];
     relatedEntityAndFields: RelatedEntity[];
     andConditions: Condition[];
@@ -28,8 +30,15 @@ type Condition = {
   export const transformToPayload = (data: InputData) => {
     const payload: any = {
       main_entity: data.mainEntity,
-      fields_to_fetch_from_main_entity: data.mainEntityFields.join(", "),
+      fields_to_fetch_from_main_entity: data.mainEntityFields?.join(", "),
     };
+
+    if (data.xField != null && data.yField != null) {
+      payload.fields_to_fetch_from_main_entity = data.xField.charAt(0).toLowerCase() + data.xField.slice(1) + ", " + data.yField.charAt(0).toLowerCase() + data.yField.slice(1);
+      payload.x_label = data.xField.charAt(0).toLowerCase() + data.xField.slice(1);
+      payload.y_label = data.yField.charAt(0).toLowerCase() + data.yField.slice(1);
+      payload.title = data.mainEntity;
+    }
   
     if (data.orConditions?.length) {
       payload.or_conditions = data.orConditions.map(
